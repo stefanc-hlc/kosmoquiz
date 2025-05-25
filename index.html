@@ -1,180 +1,88 @@
-import { useState, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KosmoQuiz</title>
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide-icons -->
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50">
+  <div id="root"></div>
 
-interface Question {
-  text: string;
-  correct: "juist" | "fout";
-  explanation: string;
-}
+  <!-- React, ReactDOM, Babel -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-const QUESTIONS: Question[] = [
-  {
-    text: "1. Planeten kan je nooit zien want ze geven geen licht.",
-    correct: "fout",
-    explanation:
-      "Planeten weerkaatsen zonlicht; daardoor kun je ze toch zien (bv. Venus, Jupiter).",
-  },
-  {
-    text: "2. Onze zon en onze planeten zijn ontstaan met de “big bang”.",
-    correct: "fout",
-    explanation:
-      "De Big Bang was 13,8 miljard jaar geleden; ons zonnestelsel ontstond pas 4,6 miljard jaar geleden uit een lokale nevel.",
-  },
-  {
-    text: "3. Een vallende ster is een ster die naar de aarde valt.",
-    correct: "fout",
-    explanation:
-      "Een vallende ster is een meteoor – een klein stukje steen of stof dat opbrandt in de atmosfeer.",
-  },
-  {
-    text: "4. In de woestijn kan je veel meer sterren zien dan op een wolkeloze nacht in België.",
-    correct: "juist",
-    explanation:
-      "Daar is vrijwel geen lichtvervuiling en de lucht is droog en helder, waardoor zwakkere sterren zichtbaar worden.",
-  },
-  {
-    text: "5. De kans is groot dat er leven is in de ruimte. De kans dat we er naartoe kunnen is met de huidige kennis onmogelijk.",
-    correct: "juist",
-    explanation:
-      "Statistisch lijken exoplaneten met leven waarschijnlijk, maar interstellaire reizen zijn met huidige voortstuwing onhaalbaar binnen een mensenleven.",
-  },
-  {
-    text: "6. Binnen een mensenleven kan je met de huidige technologie niet tot aan de verste planeten van ons zonnestelsel reizen.",
-    correct: "fout",
-    explanation:
-      "Voyager 2 bereikte Neptunus in 12 jaar; New Horizons bereikte Pluto in 9,5 jaar – dus wel degelijk mogelijk binnen één leven.",
-  },
-  {
-    text: "7. Op het zuidelijk halfrond zit de zon ’s middags in het noorden.",
-    correct: "juist",
-    explanation:
-      "Omdat de zon ten noorden van de waarnemer over de hemel gaat, staat ze rond het middaguur in het noorden.",
-  },
-  {
-    text: "8. Als de zon zou uitdoven duurt het meer dan een uur alvorens het hier donker zou worden.",
-    correct: "fout",
-    explanation:
-      "Zonlicht doet slechts 8 minuten en 20 seconden over de afstand naar de Aarde.",
-  },
-  {
-    text: "9. Een zwart gat is een planeet die alles opslokt.",
-    correct: "fout",
-    explanation:
-      "Een zwart gat is de supercompacte overblijfsel van een zware ster, geen planeet.",
-  },
-  {
-    text: "10. 21 juni is voor iedereen op aarde de langste dag van het jaar.",
-    correct: "fout",
-    explanation:
-      "Alleen op het noordelijk halfrond is 21 juni de langste dag; op het zuidelijk halfrond juist de kortste.",
-  },
-];
+  <!-- Je quiz-code -->
+  <script type="text/babel">
+    const { useState, useRef } = React;
+    const { ThumbsUp, Check, X } = lucide;
 
-export default function KosmoQuizApp() {
-  const [index, setIndex] = useState(0);
-  const [feedback, setFeedback] = useState<null | "correct" | "wrong">(null);
-  const [score, setScore] = useState(0);
+    const QUESTIONS = [
+      { text: '1. Planeten kan je nooit zien want ze geven geen licht.',     correct: 'fout',  explanation: 'Planeten weerkaatsen zonlicht …' },
+      { text: '2. Onze zon en onze planeten zijn ontstaan met de “big bang”.', correct: 'fout', explanation: '…' },
+      // … overige 8 vragen …
+    ];
 
-  // Geluidsbestanden
-  const correctSound = useRef<HTMLAudioElement | null>(null);
-  const wrongSound = useRef<HTMLAudioElement | null>(null);
+    function KosmoQuiz() {
+      const [i, setI] = useState(0);
+      const [fb, setFb] = useState(null);   // null|true|false
+      const [score, setScore] = useState(0);
+      const ok   = useRef(new Audio('sounds/correct.mp3'));
+      const nok  = useRef(new Audio('sounds/wrong.mp3'));
 
-  if (!correctSound.current) correctSound.current = new Audio("/sounds/correct.mp3");
-  if (!wrongSound.current) wrongSound.current = new Audio("/sounds/wrong.mp3");
+      const q = QUESTIONS[i];
 
-  const current = QUESTIONS[index];
+      function answer(choice) {
+        const right = choice === q.correct;
+        setFb(right);
+        if (right) setScore(s => s + 1);
+        (right ? ok.current : nok.current).play();
+      }
 
-  function handleAnswer(choice: "juist" | "fout") {
-    const isCorrect = choice === current.correct;
-    setFeedback(isCorrect ? "correct" : "wrong");
-    if (isCorrect) setScore((s) => s + 1);
+      if (i >= QUESTIONS.length) {
+        return (
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl font-bold text-indigo-700 flex justify-center items-center gap-2">
+              Quiz voltooid! {score > 5 && <ThumbsUp size={32} className="text-green-600" />}
+            </h1>
+            <p className="text-xl">Je score: {score}/10</p>
+            <button onClick={() => { setI(0); setScore(0); setFb(null); }} className="px-6 py-3 rounded-xl bg-indigo-600 text-white">Opnieuw</button>
+          </div>
+        );
+      }
 
-    const audio = isCorrect ? correctSound.current! : wrongSound.current!;
-    audio.currentTime = 0;
-    audio.play();
-  }
+      return (
+        <div className="max-w-xl w-full bg-white/70 backdrop-blur rounded-2xl shadow-2xl p-8 space-y-6">
+          <h1 className="text-3xl font-bold text-indigo-700">KosmoQuiz</h1>
+          <p className="text-xl">{q.text}</p>
 
-  function nextQuestion() {
-    setFeedback(null);
-    setIndex((i) => i + 1);
-  }
-
-  function restart() {
-    setIndex(0);
-    setFeedback(null);
-    setScore(0);
-  }
-
-  const fbStyle =
-    feedback === "correct"
-      ? "bg-green-100 text-green-800 border-green-300"
-      : "bg-orange-100 text-orange-800 border-orange-300";
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-4 bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50">
-      <Card className="w-full max-w-xl shadow-2xl rounded-2xl border-0">
-        <CardContent className="p-8 space-y-8">
-          {index < QUESTIONS.length ? (
-            <>
-              <h1 className="text-3xl font-bold text-indigo-700">KosmoQuiz</h1>
-
-              {/* Vraag */}
-              <p className="text-xl font-medium text-gray-800 min-h-[72px] flex items-center">
-                {current.text}
-              </p>
-
-              {/* Antwoordknoppen */}
-              {!feedback && (
-                <div className="flex gap-4 justify-center">
-                  <Button
-                    className="bg-green-600 hover:bg-green-700 text-white rounded-xl px-6 py-3 text-lg"
-                    onClick={() => handleAnswer("juist")}
-                  >
-                    Juist
-                  </Button>
-                  <Button
-                    className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl px-6 py-3 text-lg"
-                    onClick={() => handleAnswer("fout")}
-                  >
-                    Fout
-                  </Button>
-                </div>
-              )}
-
-              {/* Feedback */}
-              {feedback && (
-                <div className={`space-y-4 p-4 border rounded-xl ${fbStyle}`}>
-                  <div className="flex items-center gap-2 text-2xl font-semibold">
-                    {feedback === "correct" ? <Check className="w-7 h-7" /> : <X className="w-7 h-7" />} 
-                    <span>{feedback === "correct" ? "Correct!" : "Helaas, fout."}</span>
-                  </div>
-                  <p className="text-base leading-relaxed">{current.explanation}</p>
-                  <Button
-                    onClick={nextQuestion}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl"
-                  >
-                    {index === QUESTIONS.length - 1 ? "Resultaat" : "Volgende vraag"}
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              <h1 className="text-3xl font-bold text-indigo-700">Quiz voltooid!</h1>
-              <p className="text-xl text-gray-800">Je score: {score}/10</p>
-              <Button onClick={restart} className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl">
-                Opnieuw spelen
-              </Button>
-            </>
+          {!fb && (
+            <div className="flex gap-4 justify-center">
+              <button className="px-6 py-3 bg-green-600 text-white rounded-xl" onClick={() => answer('juist')}>Juist</button>
+              <button className="px-6 py-3 bg-orange-600 text-white rounded-xl" onClick={() => answer('fout')}>Fout</button>
+            </div>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Preload audio */}
-      <audio src="/sounds/correct.mp3" preload="auto" />
-      <audio src="/sounds/wrong.mp3" preload="auto" />
-    </div>
-  );
-}
+          {fb !== null && (
+            <div className={`p-4 rounded-xl border ${fb ? 'bg-green-100 border-green-300' : 'bg-orange-100 border-orange-300'}`}>
+              <div className="flex items-center gap-2 text-2xl font-semibold">
+                {fb ? <Check size={28} /> : <X size={28} />}
+                {fb ? 'Correct!' : 'Helaas, fout.'}
+              </div>
+              <p className="mt-2">{q.explanation}</p>
+              <button onClick={() => { setFb(null); setI(i+1);} } className="mt-4 px-5 py-2 rounded-xl bg-indigo-600 text-white">{i === 9 ? 'Resultaat' : 'Volgende vraag'}</button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<KosmoQuiz />);
+  </script>
+</body>
+</html>
