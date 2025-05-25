@@ -1,0 +1,5 @@
+# in je projectmap (terminal)
+echo -n '' > favicon.ico        # leeg bestand werkt al, maar zie §3 voor echt icoon
+git add favicon.ico
+git commit -m "Add empty favicon to stop 404"
+git push
