@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>KosmoQuiz</title>
 
+  <!-- voorkom 404 op /favicon.ico -->
+  <link rel="icon" href="data:," />
+
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -12,149 +15,43 @@
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50">
   <div id="root"></div>
 
-  <!-- React + React-DOM + Babel (CDN) -->
+  <!-- React + React-DOM + Babel -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- KosmoQuiz code -->
+  <!-- KosmoQuiz -->
   <script type="text/babel">
     const { useState, useRef } = React;
 
     const QUESTIONS = [
-      {
-        text: '1. Planeten kan je nooit zien want ze geven geen licht.',
-        correct: 'fout',
-        explanation: 'Planeten geven geen eigen licht af maar weerkaatsen zonlicht; daardoor zie je ze toch.',
-      },
-      {
-        text: '2. Onze zon en onze planeten zijn ontstaan met de “big bang”.',
-        correct: 'fout',
-        explanation: 'De Big Bang was 13,8 mrd jr geleden; ons zonnestelsel ontstond pas 4,6 mrd jr geleden.',
-      },
-      {
-        text: '3. Een vallende ster is een ster die naar de aarde valt.',
-        correct: 'fout',
-        explanation: 'Een “vallende ster” is een meteoroïde die in de atmosfeer opbrandt.',
-      },
-      {
-        text: '4. In de woestijn kan je veel meer sterren zien dan op een wolkeloze nacht in België.',
-        correct: 'juist',
-        explanation: 'Bijna geen lichtvervuiling en droge, heldere lucht maken zwakkere sterren zichtbaar.',
-      },
-      {
-        text: '5. De kans is groot dat er leven is in de ruimte. De kans dat we er naartoe kunnen is met de huidige kennis onmogelijk.',
-        correct: 'juist',
-        explanation: 'Veel exoplaneten ⇒ statistisch kansrijk; interstellaire reis is met huidige voortstuwing onhaalbaar.',
-      },
-      {
-        text: '6. Binnen een mensenleven kan je met de huidige technologie niet tot aan de verste planeten van ons zonnestelsel reizen.',
-        correct: 'fout',
-        explanation: 'Voyager 2 bereikte Neptunus in 12 jaar; New Horizons Pluto in 9,5 jaar.',
-      },
-      {
-        text: '7. Op het zuidelijk halfrond zit de zon ’s middags in het noorden.',
-        correct: 'juist',
-        explanation: 'De zon beweegt ten noorden van de waarnemer, dus staat rond middag in het noorden.',
-      },
-      {
-        text: '8. Als de zon zou uitdoven duurt het meer dan een uur alvorens het hier donker zou worden.',
-        correct: 'fout',
-        explanation: 'Zonlicht doet ±8 min 20 s over de afstand Zon-Aarde.',
-      },
-      {
-        text: '9. Een zwart gat is een planeet die alles opslokt.',
-        correct: 'fout',
-        explanation: 'Een zwart gat is een supercompact overblijfsel van een zware ster, geen planeet.',
-      },
-      {
-        text: '10. 21 juni is voor iedereen op aarde de langste dag van het jaar.',
-        correct: 'fout',
-        explanation: 'Alleen op het noordelijk halfrond; op het zuidelijk is het de kortste dag.',
-      },
+      { text: '1. Planeten kan je nooit zien want ze geven geen licht.', correct: 'fout', explanation: 'Planeten weerkaatsen zonlicht waardoor we ze toch zien.' },
+      { text: '2. Onze zon en onze planeten zijn ontstaan met de “big bang”.', correct: 'fout', explanation: 'De Big Bang was 13,8 mrd jr geleden; ons zonnestelsel pas 4,6 mrd jr.' },
+      { text: '3. Een vallende ster is een ster die naar de aarde valt.', correct: 'fout', explanation: 'Een vallende ster is een meteoroïde die opbrandt in de atmosfeer.' },
+      { text: '4. In de woestijn kan je veel meer sterren zien dan op een wolkeloze nacht in België.', correct: 'juist', explanation: 'Weinig lichtvervuiling en droge lucht maken zwakke sterren zichtbaar.' },
+      { text: '5. De kans is groot dat er leven is in de ruimte. De kans dat we er naartoe kunnen is met de huidige kennis onmogelijk.', correct: 'juist', explanation: 'Exoplaneten zijn talrijk; interstellaire reizen zijn nu onhaalbaar.' },
+      { text: '6. Binnen een mensenleven kan je met de huidige technologie niet tot aan de verste planeten van ons zonnestelsel reizen.', correct: 'fout', explanation: 'Voyager 2 bereikte Neptunus in 12 j; New Horizons Pluto in 9,5 j.' },
+      { text: '7. Op het zuidelijk halfrond zit de zon ’s middags in het noorden.', correct: 'juist', explanation: 'Daar beweegt de zon ten noorden van de waarnemer.' },
+      { text: '8. Als de zon zou uitdoven duurt het meer dan een uur alvorens het hier donker zou worden.', correct: 'fout', explanation: 'Licht doet ±8 min 20 s van zon tot aarde.' },
+      { text: '9. Een zwart gat is een planeet die alles opslokt.', correct: 'fout', explanation: 'Een zwart gat is het supercompacte restant van een zware ster.' },
+      { text: '10. 21 juni is voor iedereen op aarde de langste dag van het jaar.', correct: 'fout', explanation: 'Alleen op het noordelijk halfrond; op het zuidelijk is het de kortste.' },
     ];
 
     function KosmoQuiz() {
-      const [index, setIndex] = useState(0);
-      const [feedback, setFeedback] = useState(null);     // null | true | false
-      const [score, setScore] = useState(0);
+      const [index, setIndex]     = useState(0);
+      const [feedback, setFeedback] = useState(null);   // null | true | false
+      const [score, setScore]     = useState(0);
 
-      // audio
       const ok  = useRef(new Audio('sounds/correct.mp3'));
       const nok = useRef(new Audio('sounds/wrong.mp3'));
 
       const current = QUESTIONS[index];
 
-      const handleAnswer = choice => {
-        const isCorrect = choice === current.correct;
-        setFeedback(isCorrect);
-        if (isCorrect) setScore(s => s + 1);
-        (isCorrect ? ok.current : nok.current).play();
-      };
-
-      const next = () => {
-        setFeedback(null);
-        setIndex(i => i + 1);
-      };
-
-      const restart = () => {
-        setIndex(0);
-        setScore(0);
-        setFeedback(null);
-      };
-
-      // Quiz voltooid
-      if (index >= QUESTIONS.length) {
-        return (
-          <div className="text-center space-y-4">
-            <h1 className="text-3xl font-bold text-indigo-700">Quiz voltooid!</h1>
-            <p className="text-xl">Je score: {score}/10 {score > 5 && '👍'}</p>
-            <button onClick={restart} className="px-6 py-3 rounded-xl bg-indigo-600 text-white">
-              Opnieuw spelen
-            </button>
-          </div>
-        );
+      function answer(choice) {
+        const correct = choice === current.correct;
+        setFeedback(correct);
+        if (correct) setScore(s => s + 1);
+        (correct ? ok.current : nok.current).play();
       }
 
-      return (
-        <div className="max-w-xl w-full bg-white/70 backdrop-blur rounded-2xl shadow-2xl p-8 space-y-6">
-          <h1 className="text-3xl font-bold text-indigo-700">KosmoQuiz</h1>
-
-          <p className="text-xl">{current.text}</p>
-
-          {/* antwoordknoppen */}
-          {feedback === null && (
-            <div className="flex gap-4 justify-center">
-              <button className="px-6 py-3 bg-green-600 text-white rounded-xl"
-                      onClick={() => handleAnswer('juist')}>
-                Juist
-              </button>
-              <button className="px-6 py-3 bg-orange-600 text-white rounded-xl"
-                      onClick={() => handleAnswer('fout')}>
-                Fout
-              </button>
-            </div>
-          )}
-
-          {/* feedback */}
-          {feedback !== null && (
-            <div className={`p-4 rounded-xl border ${feedback ? 'bg-green-100 border-green-300' : 'bg-orange-100 border-orange-300'}`}>
-              <div className="flex items-center gap-2 text-2xl font-semibold">
-                <span className="text-3xl">{feedback ? '✓' : '✗'}</span>
-                {feedback ? 'Correct!' : 'Helaas, fout.'}
-              </div>
-              <p className="mt-2">{current.explanation}</p>
-              <button onClick={next}
-                      className="mt-4 px-5 py-2 rounded-xl bg-indigo-600 text-white">
-                {index === QUESTIONS.length - 1 ? 'Resultaat' : 'Volgende vraag'}
-              </button>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<KosmoQuiz />);
-  </script>
-</body>
-</html>
+      func
