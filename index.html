@@ -6,8 +6,6 @@
   <title>KosmoQuiz</title>
   <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide-icons -->
-  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50">
   <div id="root"></div>
@@ -17,41 +15,40 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Je quiz-code -->
+  <!-- Quiz-code -->
   <script type="text/babel">
     const { useState, useRef } = React;
-    const { ThumbsUp, Check, X } = lucide;
 
     const QUESTIONS = [
-      { text: '1. Planeten kan je nooit zien want ze geven geen licht.',     correct: 'fout',  explanation: 'Planeten weerkaatsen zonlicht …' },
+      { text: '1. Planeten kan je nooit zien want ze geven geen licht.',     correct: 'fout', explanation: 'Planeten weerkaatsen zonlicht …' },
       { text: '2. Onze zon en onze planeten zijn ontstaan met de “big bang”.', correct: 'fout', explanation: '…' },
       // … overige 8 vragen …
     ];
 
     function KosmoQuiz() {
-      const [i, setI] = useState(0);
-      const [fb, setFb] = useState(null);   // null|true|false
+      const [i, setI]     = useState(0);
+      const [fb, setFb]   = useState(null);   // null | true | false
       const [score, setScore] = useState(0);
-      const ok   = useRef(new Audio('sounds/correct.mp3'));
-      const nok  = useRef(new Audio('sounds/wrong.mp3'));
+      const ok  = useRef(new Audio('sounds/correct.mp3'));
+      const nok = useRef(new Audio('sounds/wrong.mp3'));
 
       const q = QUESTIONS[i];
 
-      function answer(choice) {
+      const answer = choice => {
         const right = choice === q.correct;
         setFb(right);
         if (right) setScore(s => s + 1);
         (right ? ok.current : nok.current).play();
-      }
+      };
 
       if (i >= QUESTIONS.length) {
         return (
           <div className="text-center space-y-4">
-            <h1 className="text-3xl font-bold text-indigo-700 flex justify-center items-center gap-2">
-              Quiz voltooid! {score > 5 && <ThumbsUp size={32} className="text-green-600" />}
-            </h1>
-            <p className="text-xl">Je score: {score}/10</p>
-            <button onClick={() => { setI(0); setScore(0); setFb(null); }} className="px-6 py-3 rounded-xl bg-indigo-600 text-white">Opnieuw</button>
+            <h1 className="text-3xl font-bold text-indigo-700">Quiz voltooid!</h1>
+            <p className="text-xl">Je score: {score}/10 {score > 5 && '👍'}</p>
+            <button onClick={() => { setI(0); setScore(0); setFb(null); }} className="px-6 py-3 rounded-xl bg-indigo-600 text-white">
+              Opnieuw
+            </button>
           </div>
         );
       }
@@ -63,7 +60,7 @@
 
           {!fb && (
             <div className="flex gap-4 justify-center">
-              <button className="px-6 py-3 bg-green-600 text-white rounded-xl" onClick={() => answer('juist')}>Juist</button>
+              <button className="px-6 py-3 bg-green-600 text-white rounded-xl"  onClick={() => answer('juist')}>Juist</button>
               <button className="px-6 py-3 bg-orange-600 text-white rounded-xl" onClick={() => answer('fout')}>Fout</button>
             </div>
           )}
@@ -71,18 +68,9 @@
           {fb !== null && (
             <div className={`p-4 rounded-xl border ${fb ? 'bg-green-100 border-green-300' : 'bg-orange-100 border-orange-300'}`}>
               <div className="flex items-center gap-2 text-2xl font-semibold">
-                {fb ? <Check size={28} /> : <X size={28} />}
+                <span className="text-3xl">{fb ? '✓' : '✗'}</span>
                 {fb ? 'Correct!' : 'Helaas, fout.'}
               </div>
               <p className="mt-2">{q.explanation}</p>
-              <button onClick={() => { setFb(null); setI(i+1);} } className="mt-4 px-5 py-2 rounded-xl bg-indigo-600 text-white">{i === 9 ? 'Resultaat' : 'Volgende vraag'}</button>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<KosmoQuiz />);
-  </script>
-</body>
-</html>
+              <button
+                onClick={() => { setFb(n
