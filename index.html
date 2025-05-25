@@ -33,4 +33,134 @@
       {
         text: '2. Onze zon en onze planeten zijn ontstaan met de “big bang”.',
         correct: 'fout',
-        explana
+        explanation: 'Het zonnestelsel ontstond 4,6 miljard jaar geleden, lang na de Big Bang.',
+      },
+      {
+        text: '3. Een vallende ster is een ster die naar de aarde valt.',
+        correct: 'fout',
+        explanation: 'Een vallende ster is een meteoroïde die opbrandt in de atmosfeer.',
+      },
+      {
+        text: '4. In de woestijn kan je meer sterren zien dan op een wolkeloze nacht in België.',
+        correct: 'juist',
+        explanation: 'Weinig lichtvervuiling en droge lucht maken zwakke sterren zichtbaar.',
+      },
+      {
+        text: '5. De kans is groot dat er leven is in de ruimte. Ernaartoe reizen is nu onmogelijk.',
+        correct: 'juist',
+        explanation: 'Exoplaneten zijn talrijk, maar interstellaire reizen zijn onhaalbaar met huidige technologie.',
+      },
+      {
+        text: '6. Binnen een mensenleven kan je niet tot de verste planeten van ons zonnestelsel reizen.',
+        correct: 'fout',
+        explanation: 'Voyager 2 bereikte Neptunus in 12 jaar; New Horizons Pluto in 9,5 jaar.',
+      },
+      {
+        text: '7. Op het zuidelijk halfrond zit de zon ’s middags in het noorden.',
+        correct: 'juist',
+        explanation: 'De zon beweegt ten noorden van de waarnemer over de hemel.',
+      },
+      {
+        text: '8. Als de zon uitdooft duurt het meer dan een uur voor het hier donker wordt.',
+        correct: 'fout',
+        explanation: 'Licht doet circa 8 min 20 s over de afstand Zon-Aarde.',
+      },
+      {
+        text: '9. Een zwart gat is een planeet die alles opslokt.',
+        correct: 'fout',
+        explanation: 'Een zwart gat is een supercompact restant van een zware ster, geen planeet.',
+      },
+      {
+        text: '10. 21 juni is overal op aarde de langste dag.',
+        correct: 'fout',
+        explanation: 'Alleen op het noordelijk halfrond; op het zuidelijk is het de kortste dag.',
+      },
+    ];
+
+    function KosmoQuiz() {
+      const [index, setIndex]       = useState(0);
+      const [feedback, setFeedback] = useState(null);   // null | true | false
+      const [score, setScore]       = useState(0);
+
+      const okSound  = useRef(new Audio('sounds/correct.mp3'));
+      const nokSound = useRef(new Audio('sounds/wrong.mp3'));
+
+      const current = QUESTIONS[index];
+
+      function handleAnswer(choice) {
+        const correct = choice === current.correct;
+        setFeedback(correct);
+        if (correct) setScore(s => s + 1);
+        (correct ? okSound.current : nokSound.current).play();
+      }
+
+      function nextQuestion() {
+        setFeedback(null);
+        setIndex(i => i + 1);
+      }
+
+      function restartQuiz() {
+        setIndex(0);
+        setScore(0);
+        setFeedback(null);
+      }
+
+      /* Quiz klaar */
+      if (index >= QUESTIONS.length) {
+        return (
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl font-bold text-indigo-700">Quiz voltooid!</h1>
+            <p className="text-xl">Je score: {score}/10 {score > 5 && '👍'}</p>
+            <button onClick={restartQuiz} className="px-6 py-3 bg-indigo-600 text-white rounded-xl">
+              Opnieuw spelen
+            </button>
+          </div>
+        );
+      }
+
+      /* Vraag + feedback */
+      return (
+        <div className="max-w-xl w-full bg-white/70 backdrop-blur rounded-2xl shadow-2xl p-8 space-y-6">
+          <h1 className="text-3xl font-bold text-indigo-700">KosmoQuiz</h1>
+          <p className="text-xl">{current.text}</p>
+
+          {feedback === null && (
+            <div className="flex gap-4 justify-center">
+              <button
+                className="px-6 py-3 bg-green-600 text-white rounded-xl"
+                onClick={() => handleAnswer('juist')}
+              >
+                Juist
+              </button>
+              <button
+                className="px-6 py-3 bg-orange-600 text-white rounded-xl"
+                onClick={() => handleAnswer('fout')}
+              >
+                Fout
+              </button>
+            </div>
+          )}
+
+          {feedback !== null && (
+            <div className={`p-4 rounded-xl border ${feedback ? 'bg-green-100 border-green-300' : 'bg-orange-100 border-orange-300'}`}>
+              <div className="flex items-center gap-2 text-2xl font-semibold">
+                <span className="text-3xl">{feedback ? '✓' : '✗'}</span>
+                {feedback ? 'Correct!' : 'Helaas, fout.'}
+              </div>
+              <p className="mt-2">{current.explanation}</p>
+              <button
+                onClick={nextQuestion}
+                className="mt-4 px-5 py-2 rounded-xl bg-indigo-600 text-white"
+              >
+                {index === 9 ? 'Resultaat' : 'Volgende vraag'}
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<KosmoQuiz />);
+  </script>
+</body>
+</html>
